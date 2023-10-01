@@ -1,5 +1,5 @@
 module "mynetwork"{
-    source= "../network"
+    source= "./network"
     cidr=var.cidr
     pub-sub=var.sub-pub-cidr
     priv-sub=var.sub-priv-cidr
