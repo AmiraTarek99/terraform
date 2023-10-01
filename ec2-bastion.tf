@@ -9,10 +9,10 @@ resource "aws_instance" "bastion_instance" {
   provisioner "local-exec" {
     command= "echo ${self.public_ip} "
   }
-    provisioner "local-exec" {
+   /* provisioner "local-exec" {
     command= "ssh -i tf-keypair.pem ec2-user@${self.public_ip}"
     interpreter = ["BashShell", "-Command"]
-  }
+  }*/
     
 
   user_data = <<-EOF
