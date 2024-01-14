@@ -1,0 +1,59 @@
+pipeline {
+    agent any
+
+    parameters {
+        choice choices: ['dev', 'prod'], name: 'workspace'
+        choice choices: ['apply', 'destroy'], name: 'action'
+    }
+    
+    environment {
+        workspace = "${params.workspace}"
+        action = "${params.action}"
+        AWS_ACCESS_KEY_ID = credentials('aws-access-key-id')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
+    }
+    
+    stages {
+        stage('Git') {
+            steps {
+                git branch: 'main', url: 'https://github.com/AmiraTarek99/terraform.git'
+            }
+        }
+        
+        stage('init') {
+            steps {
+                sh 'terraform init'
+            }
+        }
+        
+        stage('workspace') {
+            steps {
+                /*sh '''#!/bin/bash
+                export workspace=$1
+                terraform workspace list > ./list
+                ws=$(grep -il "${workspace}" ./list)
+                if [ -z "$ws" ]; then
+                    terraform workspace new ${workspace}
+                fi
+                '''*/
+                //sh "/bin/bash ./ckeckbash.sh $workspace"
+                
+                
+                sh 'terraform workspace list'
+            }
+        }
+        
+        stage('plan') {
+            steps {
+                sh "terraform workspace select ${workspace}"
+                sh "terraform plan --var-file ${workspace}.tfvars"
+            }
+        }
+        
+        stage('action') {
+            steps {
+                sh "terraform ${action} -auto-approve --var-file ${workspace}.tfvars"
+            }
+        }
+    }
+}
